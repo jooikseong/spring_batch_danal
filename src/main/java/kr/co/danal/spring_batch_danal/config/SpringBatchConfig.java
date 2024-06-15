@@ -7,18 +7,21 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
+import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 @Configuration
 @EnableBatchProcessing
@@ -85,7 +88,7 @@ public class SpringBatchConfig {
     ) {
 
         Step step = stepBuilderFactory.get("ETL-file-load")
-                .<Store, Store>chunk(10000)
+                .<Store, Store>chunk(1000)
                 .reader(itemReader)
                 .processor(itemProcessor)
                 .writer(itemWriter)
@@ -102,7 +105,7 @@ public class SpringBatchConfig {
     public FlatFileItemReader<Store> itemReader() {
 
         FlatFileItemReader<Store> flatFileItemReader = new FlatFileItemReader<>();
-        flatFileItemReader.setResource(new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_경기_202403.csv"));
+        flatFileItemReader.setResource(new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_세종_202403.csv"));
         flatFileItemReader.setName("CSV-Reader");
         flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(lineMapper());
@@ -137,5 +140,22 @@ public class SpringBatchConfig {
 
         return defaultLineMapper;
     }
+
+
+//    @Bean
+//    public ItemProcessor<Store, Store> itemProcessor() {
+//        return store -> {
+//            // 여기에 데이터 처리 로직을 추가하세요
+//            return store;
+//        };
+//    }
+//
+//    @Bean
+//    public ItemWriter<Store> itemWriter() {
+//        return items -> {
+//            // 여기에 데이터 저장 로직을 추가하세요
+//            items.forEach(System.out::println);
+//        };
+//    }
 
 }

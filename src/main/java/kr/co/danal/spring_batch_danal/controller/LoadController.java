@@ -44,13 +44,21 @@ public class LoadController {
 //
 //        return jobExecution.getStatus();
 //    }
-    @PostMapping
-    public ResponseEntity<BatchStatus> load() {
-        try {
-            JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
-            return new ResponseEntity<>(jobExecution.getStatus(), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+    @GetMapping
+    public ResponseEntity<BatchStatus> load() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+        Map<String, JobParameter> maps = new HashMap<>();
+        maps.put("time", new JobParameter(System.currentTimeMillis()));
+        JobParameters parameters = new JobParameters(maps);
+        JobExecution jobExecution = jobLauncher.run(job, parameters);
+
+        System.out.println("JobExecution: " + jobExecution.getStatus());
+
+        System.out.println("Batch is Running...");
+        while (jobExecution.isRunning()) {
+            System.out.println("...");
         }
+
+        return ResponseEntity.ok(jobExecution.getStatus());
     }
 }
