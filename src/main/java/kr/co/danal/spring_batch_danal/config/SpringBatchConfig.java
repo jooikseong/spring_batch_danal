@@ -88,7 +88,7 @@ public class SpringBatchConfig {
     ) {
 
         Step step = stepBuilderFactory.get("ETL-file-load")
-                .<Store, Store>chunk(1000)
+                .<Store, Store>chunk(10)
                 .reader(itemReader)
                 .processor(itemProcessor)
                 .writer(itemWriter)
@@ -106,6 +106,7 @@ public class SpringBatchConfig {
 
         FlatFileItemReader<Store> flatFileItemReader = new FlatFileItemReader<>();
         flatFileItemReader.setResource(new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_세종_202403.csv"));
+//        flatFileItemReader.setResource(new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_울산_202403.csv"));
         flatFileItemReader.setName("CSV-Reader");
         flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(lineMapper());
