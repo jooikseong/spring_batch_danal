@@ -1,0 +1,25 @@
+server:
+  port: 9090
+spring:
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://220.126.251.96:3306/mydb?serverTimezone=Asia/Seoul
+    username: root
+    password: test1357
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    root: info
