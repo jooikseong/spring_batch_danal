@@ -43,7 +43,7 @@ class SpringBatchDanalApplicationTests {
 	public void testLoad() throws Exception {
 		// Mock JobExecution
 		JobExecution jobExecution = new JobExecution(1L);
-		jobExecution.setStatus(BatchStatus.RUNNING);
+		jobExecution.setStatus(BatchStatus.STARTED);
 
 		// Mock jobLauncher.run() method
 		when(jobLauncher.run(any(Job.class), any(JobParameters.class))).thenReturn(jobExecution);
