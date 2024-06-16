@@ -1,25 +1,51 @@
 package kr.co.danal.spring_batch_danal;
 
+import kr.co.danal.spring_batch_danal.config.SpringBatchConfig;
 import kr.co.danal.spring_batch_danal.controller.LoadController;
+import kr.co.danal.spring_batch_danal.model.Store;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.test.MetaDataInstanceFactory;
+import org.springframework.batch.test.context.SpringBatchTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
+@SpringBatchTest
 class SpringBatchDanalApplicationTests {
+
+	@Autowired
+	private ItemReader<Store> itemReader;
+	@Autowired
+	private ItemProcessor<Store, Store> itemProcessor;
 
 	@Test
 	void contextLoads() {
@@ -41,27 +67,41 @@ class SpringBatchDanalApplicationTests {
 
 	@Test
 	public void testLoad() throws Exception {
-		// Mock JobExecution
 		JobExecution jobExecution = new JobExecution(1L);
 		jobExecution.setStatus(BatchStatus.STARTED);
 
-		// Mock jobLauncher.run() method
 		when(jobLauncher.run(any(Job.class), any(JobParameters.class))).thenReturn(jobExecution);
 
-		// Call the load() method
 		ResponseEntity<BatchStatus> responseEntity = loadController.load();
 
-		// Verify that jobLauncher.run() is called with the correct parameters
 		verify(jobLauncher, times(1)).run(eq(job), any(JobParameters.class));
 
-		// Assert that the response status is HttpStatus.OK (200)
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-
-		// Assert that the response body contains the same BatchStatus as jobExecution.getStatus()
 		assertEquals(jobExecution.getStatus(), responseEntity.getBody());
 
-		// Optionally, you can verify other aspects of the job execution or response
-		// For example, verify that appropriate log messages are printed
+	}
+
+	@Test
+	public void testItemReader() throws Exception {
+		// ClassPathResource를 사용하여 파일 경로 설정
+		Resource resource = new ClassPathResource("소상공인시장진흥공단_상가(상권)정보_세종_202403.csv");
+		FlatFileItemReader<Store> reader = (FlatFileItemReader<Store>) itemReader;
+		reader.setResource(resource);
+		reader.open(MetaDataInstanceFactory.createStepExecution().getExecutionContext());
+
+		Store store;
+		while ((store = reader.read()) != null) {
+			assertThat(store).isNotNull();
+		}
+
+		reader.close();
+	}
+
+	@Test
+	public void testItemProcessor() throws Exception {
+		Store input = new Store();
+		Store output = itemProcessor.process(input);
+		assertThat(output).isNotNull();
 	}
 
 }

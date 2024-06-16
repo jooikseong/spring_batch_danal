@@ -3,15 +3,14 @@ package kr.co.danal.spring_batch_danal.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
-import org.springframework.data.geo.Point;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.util.Date;
 
 @Entity
 @Getter@Setter
 public class Store {
+
     @Id
     private String id;
     @Comment("상호명")
@@ -35,15 +34,15 @@ public class Store {
     @Comment("표준산업분류명")
     private String standardName;
     @Comment("시도코드")
-    private String cityCode;
+    private Integer cityCode;
     @Comment("시도명")
     private String cityName;
     @Comment("시군구코드")
-    private String addressCode;
+    private Integer addressCode;
     @Comment("시군구명")
     private String addressName;
     @Comment("행정동코드")
-    private String administrativeDongCode;
+    private Integer administrativeDongCode;
     @Comment("행정동명")
     private String administrativeDongName;
     @Comment("법정동코드")
@@ -53,13 +52,13 @@ public class Store {
     @Comment("지번코드")
     private String numberCode;
     @Comment("대지구분코드")
-    private String landCode;
+    private Integer landCode;
     @Comment("대지구분명")
     private String landName;
     @Comment("지번본번지")
-    private String localMainNumber;
+    private Integer localMainNumber;
     @Comment("지번부번지")
-    private String localSubNumber;
+    private Integer localSubNumber;
     @Comment("지번주소")
     private String localAddress;
     @Comment("도로명코드")
@@ -67,9 +66,9 @@ public class Store {
     @Comment("도로명")
     private String roadName;
     @Comment("건물본번지")
-    private String buildMainNumber;
+    private Integer buildMainNumber;
     @Comment("건물부번지")
-    private String buildSubNumber;
+    private Integer buildSubNumber;
     @Comment("건물관리번호")
     private String buildMgmtNumber;
     @Comment("건물명")
@@ -77,9 +76,9 @@ public class Store {
     @Comment("도로명주소")
     private String roadNameAddress;
     @Comment("구우편번호")
-    private String oldPostalCode;
+    private Integer oldPostalCode;
     @Comment("신우편번호")
-    private String newPostalCode;
+    private Integer newPostalCode;
     @Comment("동정보")
     private String dong;
     @Comment("층정보")
@@ -87,7 +86,7 @@ public class Store {
     @Comment("호정보")
     private String ho;
     @Comment("경도")
-    private String longitude;
+    private Double longitude;
     @Comment("위도")
-    private String latitude;
+    private Double latitude;
 }

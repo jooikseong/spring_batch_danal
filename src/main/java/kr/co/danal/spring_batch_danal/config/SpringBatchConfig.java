@@ -2,6 +2,7 @@ package kr.co.danal.spring_batch_danal.config;
 
 import kr.co.danal.spring_batch_danal.model.Store;
 import kr.co.danal.spring_batch_danal.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -20,11 +21,13 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 @Configuration
 @EnableBatchProcessing
+@Slf4j
 public class SpringBatchConfig {
 
 //    @Bean
@@ -102,11 +105,40 @@ public class SpringBatchConfig {
     }
 
     @Bean
-    public FlatFileItemReader<Store> itemReader() {
+    @Primary
+    public MultiResourceItemReader<Store> multiResourceItemReader() {
+        MultiResourceItemReader<Store> multiResourceItemReader = new MultiResourceItemReader<>();
+        multiResourceItemReader.setResources(getResources());
+        multiResourceItemReader.setDelegate(flatFileItemReader());
+        return multiResourceItemReader;
+    }
+
+    private Resource[] getResources() {
+        return new Resource[]{
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_세종_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_울산_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_제주_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_경남_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_경북_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_광주_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_대전_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_부산_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_인천_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_전남_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_전북_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_충남_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_충북_202403.csv"),
+                //new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_서울_202403.csv"),
+                //new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_경기_202403.csv"),
+                new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_대구_202403.csv")
+        };
+    }
+
+    @Bean
+    public FlatFileItemReader<Store> flatFileItemReader() {
 
         FlatFileItemReader<Store> flatFileItemReader = new FlatFileItemReader<>();
-        flatFileItemReader.setResource(new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_세종_202403.csv"));
-//        flatFileItemReader.setResource(new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_울산_202403.csv"));
+        // flatFileItemReader.setResource(new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_세종_202403.csv"));
         flatFileItemReader.setName("CSV-Reader");
         flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(lineMapper());
@@ -141,22 +173,5 @@ public class SpringBatchConfig {
 
         return defaultLineMapper;
     }
-
-
-//    @Bean
-//    public ItemProcessor<Store, Store> itemProcessor() {
-//        return store -> {
-//            // 여기에 데이터 처리 로직을 추가하세요
-//            return store;
-//        };
-//    }
-//
-//    @Bean
-//    public ItemWriter<Store> itemWriter() {
-//        return items -> {
-//            // 여기에 데이터 저장 로직을 추가하세요
-//            items.forEach(System.out::println);
-//        };
-//    }
 
 }

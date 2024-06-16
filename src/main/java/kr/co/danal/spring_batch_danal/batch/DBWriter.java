@@ -38,8 +38,8 @@ public class DBWriter implements ItemWriter<Store> {
     }
 
     @Override
-    public void write(List<? extends Store> stores) throws Exception{
-        System.out.println("Data Saved for Users: " + stores);
+    public void write(List<? extends Store> stores) throws Exception {
+        System.out.println("Data Saved for Store : " + stores);
         storeRepository.saveAll(stores);
     }
 }
