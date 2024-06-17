@@ -4,10 +4,10 @@ import kr.co.danal.spring_batch_danal.model.Store;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -22,31 +22,32 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@EnableBatchProcessing
 @Slf4j
 public class SpringBatchConfig {
 
+
     @Bean
-    public Job job(JobBuilderFactory jobBuilderFactory,
-                   StepBuilderFactory stepBuilderFactory,
+    public Job simpleJob1(JobRepository jobRepository, Step simpleStep1) {
+        return new JobBuilder("job", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(simpleStep1)
+                .build();
+    }
+    @Bean
+    public Step simpleStep1(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                    ItemReader<Store> itemReader,
                    ItemProcessor<Store, Store> itemProcessor,
                    ItemWriter<Store> itemWriter
-    ) {
-
-        Step step = stepBuilderFactory.get("ETL-file-load")
+    ){
+        return new StepBuilder("step", jobRepository)
                 .<Store, Store>chunk(10)
                 .reader(itemReader)
                 .processor(itemProcessor)
                 .writer(itemWriter)
-                .build();
-
-
-        return jobBuilderFactory.get("ETL-Load")
-                .incrementer(new RunIdIncrementer())
-                .start(step)
+                .transactionManager(transactionManager)
                 .build();
     }
 
@@ -84,7 +85,6 @@ public class SpringBatchConfig {
     public FlatFileItemReader<Store> flatFileItemReader() {
 
         FlatFileItemReader<Store> flatFileItemReader = new FlatFileItemReader<>();
-        // flatFileItemReader.setResource(new FileSystemResource("src/main/resources/소상공인시장진흥공단_상가(상권)정보_세종_202403.csv"));
         flatFileItemReader.setName("CSV-Reader");
         flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(lineMapper());

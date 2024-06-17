@@ -1,10 +1,10 @@
 package kr.co.danal.spring_batch_danal.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
-import javax.persistence.*;
 
 
 @Entity
