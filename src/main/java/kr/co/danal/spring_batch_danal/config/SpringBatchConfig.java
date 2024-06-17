@@ -28,16 +28,15 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Slf4j
 public class SpringBatchConfig {
 
-
     @Bean
-    public Job simpleJob1(JobRepository jobRepository, Step simpleStep1) {
+    public Job job(JobRepository jobRepository, Step step) {
         return new JobBuilder("job", jobRepository)
                 .incrementer(new RunIdIncrementer())
-                .start(simpleStep1)
+                .start(step)
                 .build();
     }
     @Bean
-    public Step simpleStep1(JobRepository jobRepository, PlatformTransactionManager transactionManager,
+    public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                    ItemReader<Store> itemReader,
                    ItemProcessor<Store, Store> itemProcessor,
                    ItemWriter<Store> itemWriter
@@ -83,13 +82,11 @@ public class SpringBatchConfig {
 
     @Bean
     public FlatFileItemReader<Store> flatFileItemReader() {
-
         FlatFileItemReader<Store> flatFileItemReader = new FlatFileItemReader<>();
         flatFileItemReader.setName("CSV-Reader");
         flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(lineMapper());
         return flatFileItemReader;
-
     }
 
     @Bean
